@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mock Exam</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root { --fs: 18px; --blue: #1f4e8c; --bg: #f3f5f8; --ok: #1e8e3e; --bad: #c5221f; }
+* { box-sizing: border-box; }
+html { font-size: var(--fs); }
+body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: var(--bg); color: #1b1f24; min-height: 100vh; }
+button { font: inherit; cursor: pointer; border: 1px solid #b8c0cc; background: #fff; border-radius: 4px; padding: .35em .9em; }
+button:hover { background: #e8edf5; }
+button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+button.primary:hover { background: #174073; }
+button:disabled { opacity: .4; cursor: default; }
+.hidden { display: none !important; }
+header.bar { background: var(--blue); color: #fff; display: flex; align-items: center; gap: 1rem; padding: .5rem 1.5rem; position: sticky; top: 0; z-index: 5; }
+header.bar .grow { flex: 1; }
+header.bar button { background: transparent; color: #fff; border-color: #ffffff77; padding: .2em .7em; }
+header.bar button:hover { background: #ffffff22; }
+#progress { height: 4px; background: #ffffff33; }
+#progress div { height: 100%; background: #7fd1ff; width: 0; }
+main { width: 100%; padding: 1.5rem 1.5rem 6rem; }
+.card { background: #fff; border: 1px solid #d6dce5; border-radius: 6px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; }
+#stem p { margin: 0 0 .8em; line-height: 1.5; }
+#stem p:last-child { margin-bottom: 0; }
+.hint { color: #556; font-size: .85rem; margin-bottom: .6rem; }
+.opt { display: flex; gap: .8rem; align-items: flex-start; padding: .75rem 1rem; border: 2px solid #d6dce5; border-radius: 6px; margin-bottom: .6rem; background: #fff; cursor: pointer; line-height: 1.45; }
+.opt:hover { border-color: #8aa4cc; }
+.opt .key { flex: none; width: 1.8em; height: 1.8em; border-radius: 50%; border: 2px solid #8896ab; display: grid; place-items: center; font-size: .8rem; font-weight: 700; color: #445; }
+.opt.sel { border-color: var(--blue); background: #eaf1fb; }
+.opt.sel .key { background: var(--blue); color: #fff; border-color: var(--blue); }
+.done .opt { cursor: default; }
+.opt.right { border-color: var(--ok); background: #e6f4ea; }
+.opt.right .key { background: var(--ok); color: #fff; border-color: var(--ok); }
+.opt.wrong { border-color: var(--bad); background: #fce8e6; }
+.opt.wrong .key { background: var(--bad); color: #fff; border-color: var(--bad); }
+.opt.missed { border-style: dashed; }
+.banner { padding: .8rem 1.2rem; border-radius: 6px; font-weight: 600; margin-bottom: 1rem; }
+.banner.ok { background: #e6f4ea; color: var(--ok); border: 1px solid var(--ok); }
+.banner.bad { background: #fce8e6; color: var(--bad); border: 1px solid var(--bad); }
+#expl { line-height: 1.55; }
+#expl ul { padding-left: 1.3em; }
+#expl a { color: var(--blue); word-break: break-all; }
+footer.nav { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #c9d1dc; display: flex; justify-content: space-between; align-items: center; padding: .6rem 1.5rem; gap: 1rem; }
+footer.nav .mid { color: #667; font-size: .8rem; }
+.f-b { font-weight: 700; } .f-u { text-decoration: underline; } .f-s { text-decoration: line-through; } .f-h { background: #ffe66d; }
+.form { display: grid; grid-template-columns: max-content 1fr; gap: .8rem 1.2rem; align-items: center; max-width: 600px; }
+input, select { font: inherit; padding: .35em .5em; border: 1px solid #b8c0cc; border-radius: 4px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: .45rem .7rem; border-bottom: 1px solid #e1e5eb; }
+tr.row { cursor: pointer; } tr.row:hover { background: #eef3fb; }
+.good { color: var(--ok); font-weight: 700; } .badc { color: var(--bad); font-weight: 700; } .skip { color: #889; }
+.stats { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0; }
+.stats div b { display: block; font-size: 1.6rem; }
+#modal { position: fixed; inset: 0; background: #0008; display: grid; place-items: center; z-index: 20; }
+#modal .box { background: #fff; border-radius: 8px; padding: 1.2rem 1.6rem; max-height: 90vh; overflow: auto; min-width: 420px; }
+kbd { background: #eef0f4; border: 1px solid #b8c0cc; border-bottom-width: 2px; border-radius: 4px; padding: .05em .45em; font-size: .85em; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <b>Mock Exam</b>
+  <span id="hdrInfo" class="grow"></span>
+  <span id="fmtBtns" class="hidden">
+    <button data-f="bold"><b>B</b></button>
+    <button data-f="underline"><u>U</u></button>
+    <button data-f="strike"><s>S</s></button>
+    <button data-f="highlight">H</button>
+    <button data-f="clear">Clear</button>
+  </span>
+  <button id="fMinus" title="Smaller font">A−</button>
+  <button id="fPlus" title="Larger font">A+</button>
+  <button id="endTest" class="hidden">End test</button>
+  <button id="btnSettings">Shortcuts</button>
+</header>
+<div id="progress"><div></div></div>
+
+<main>
+  <section id="setup" class="card">
+    <h2 style="margin-top:0">New practice test</h2>
+    <div class="form">
+      <label for="count">Number of questions</label>
+      <input id="count" type="number" min="1" value="20" style="width:7em">
+      <label for="inf">Infinite mode</label>
+      <label><input type="checkbox" id="inf"> no question limit: solve as many as you want, press End to finish</label>
+      <label for="domain">Domain</label>
+      <select id="domain"></select>
+      <label for="mode">Questions</label>
+      <select id="mode">
+        <option value="all">All</option>
+        <option value="unseen">Never answered</option>
+        <option value="wrong">Last answered wrong</option>
+      </select>
+      <span></span>
+      <span id="poolInfo" class="hint"></span>
+    </div>
+    <p><button id="start" class="primary">Start (Enter)</button></p>
+    <h3>Progress</h3>
+    <div id="progStats" class="stats"></div>
+    <div id="history"></div>
+    <p><button id="resetProg">Reset progress</button></p>
+  </section>
+
+  <section id="exam" class="hidden">
+    <div class="card"><div id="stem" class="annot-root"></div></div>
+    <div class="hint" id="selHint"></div>
+    <div id="opts"></div>
+    <div id="feedback"></div>
+  </section>
+
+  <section id="result" class="hidden">
+    <div class="card">
+      <h2 style="margin-top:0">Results</h2>
+      <div class="stats" id="stats"></div>
+      <p>
+        <button id="toggleBreak">Time per question</button>
+        <button id="again" class="primary">New test</button>
+      </p>
+      <div id="breakdown" class="hidden"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="nav hidden" id="nav">
+  <button id="prev"></button>
+  <span class="mid" id="navMid"></span>
+  <button id="next" class="primary"></button>
+</footer>
+
+<div id="modal" class="hidden"><div class="box">
+  <h3 style="margin-top:0">Keyboard shortcuts</h3>
+  <table id="keyTable"></table>
+  <p class="hint">Click "Change", then press the new key. Esc cancels.</p>
+  <p><button id="resetKeys">Reset to defaults</button> <button id="closeModal" class="primary">Close</button></p>
+</div></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const DEFAULT_KEYS = {
+  opt1: '1', opt2: '2', opt3: '3', opt4: '4', opt5: '5', opt6: '6',
+  next: ' ', prev: 'Backspace', skip: 'ArrowRight', finish: 'End',
+  bold: 'b', underline: 'u', strike: 's', highlight: 'h', clear: 'x',
+  fontUp: '=', fontDown: '-',
+};
+const LABELS = {
+  opt1: 'Select option 1', opt2: 'Select option 2', opt3: 'Select option 3', opt4: 'Select option 4',
+  opt5: 'Select option 5', opt6: 'Select option 6', next: 'Check answer / next question', prev: 'Previous question', skip: 'Skip without checking', finish: 'End test early',
+  bold: 'Bold selection', underline: 'Underline selection', strike: 'Strikethrough selection',
+  highlight: 'Highlight selection', clear: 'Clear formatting of selection', fontUp: 'Larger font', fontDown: 'Smaller font',
+};
+const FMT = { bold: 'f-b', underline: 'f-u', strike: 'f-s', highlight: 'f-h' };
+
+let keys = { ...DEFAULT_KEYS, ...JSON.parse(localStorage.getItem('keys') || '{}') };
+let fs = parseInt(localStorage.getItem('fs') || '18');
+let Q = [], P = { questions: {}, sessions: [] }, S = null, screen = 'setup', rebind = null;
+
+const keyName = k => k === ' ' ? 'Space' : k.length === 1 ? k.toUpperCase() : k;
+const normKey = e => {
+  const c = e.code || '';
+  if (/^Key[A-Z]$/.test(c)) return c.slice(3).toLowerCase();
+  if (/^(Digit|Numpad)[0-9]$/.test(c)) return c.slice(-1);
+  if (c === 'Equal' || c === 'NumpadAdd') return '=';
+  if (c === 'Minus' || c === 'NumpadSubtract') return '-';
+  return e.key.length === 1 ? e.key.toLowerCase() : e.key;
+};
+const fmtT = ms => { const s = Math.round(ms / 1000); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+
+function setFont(v) {
+  fs = Math.max(12, Math.min(40, v));
+  document.documentElement.style.setProperty('--fs', fs + 'px');
+  localStorage.setItem('fs', fs);
+}
+
+function show(name) {
+  screen = name;
+  for (const id of ['setup', 'exam', 'result']) $('#' + id).classList.toggle('hidden', id !== name);
+  $('#nav').classList.toggle('hidden', name !== 'exam');
+  $('#fmtBtns').classList.toggle('hidden', name !== 'exam');
+  $('#endTest').classList.toggle('hidden', name !== 'exam');
+  if (name !== 'exam') { $('#hdrInfo').textContent = ''; $('#progress div').style.width = '0'; }
+}
+
+async function init() {
+  setFont(fs);
+  Q = await (await fetch('/api/questions')).json();
+  const doms = [...new Set(Q.map(q => q.domain))].sort();
+  $('#domain').innerHTML = '<option value="">All domains</option>' + doms.map(d => `<option>${d}</option>`).join('');
+  $('#count').value = localStorage.getItem('count') || 20;
+  $('#domain').value = localStorage.getItem('domainFilter') || '';
+  $('#mode').value = localStorage.getItem('mode') || 'all';
+  $('#inf').checked = localStorage.getItem('inf') === '1';
+  $('#count').disabled = $('#inf').checked;
+  P = await (await fetch('/api/progress')).json();
+  updatePool();
+  show('setup');
+}
+
+function pool() {
+  const d = $('#domain').value, m = $('#mode').value;
+  return Q.filter(q => (!d || q.domain === d) &&
+    (m === 'all' || (m === 'unseen' ? !P.questions[q.id] : P.questions[q.id] && !P.questions[q.id].last_ok)));
+}
+function updatePool() {
+  $('#poolInfo').textContent = pool().length + ' questions available';
+  const rec = Object.values(P.questions);
+  const att = rec.reduce((a, r) => a + r.attempts, 0), cor = rec.reduce((a, r) => a + r.correct, 0);
+  $('#progStats').innerHTML = `
+    <div><b>${att}</b>answers given</div>
+    <div><b>${rec.length} / ${Q.length}</b>unique questions seen</div>
+    <div><b>${att ? Math.round(cor / att * 100) : 0}%</b>correct overall</div>
+    <div><b>${P.sessions.length}</b>finished tests</div>`;
+  const last = P.sessions.slice(-5).reverse();
+  $('#history').innerHTML = last.length ? '<table><tr><th>Date</th><th>Score</th><th>Questions</th><th>Total time</th></tr>' +
+    last.map(s => `<tr><td>${s.ts.replace('T', ' ')}</td><td>${s.total ? Math.round(s.correct / s.total * 100) : 0}% (${s.correct}/${s.total})</td><td>${s.answered} answered</td><td>${fmtT(s.ms)}</td></tr>`).join('') + '</table>' : '';
+}
+
+function post(url, body) {
+  return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+}
+
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+function start() {
+  const p = pool();
+  if (!p.length) { alert('No questions match this filter.'); return; }
+  const inf = $('#inf').checked;
+  const n = inf ? p.length : Math.max(1, Math.min(parseInt($('#count').value) || 1, p.length));
+  if (!inf) localStorage.setItem('count', n);
+  localStorage.setItem('inf', inf ? '1' : '0');
+  localStorage.setItem('domainFilter', $('#domain').value);
+  localStorage.setItem('mode', $('#mode').value);
+  S = { items: shuffle(p).slice(0, n).map(q => ({ q, sel: [], done: false, ok: null, anno: null, ms: 0 })), idx: 0, enter: null, finished: false, infinite: inf };
+  S.enter = Date.now();
+  show('exam');
+  render();
+}
+
+function cur() { return S.items[S.idx]; }
+
+function saveAnno() {
+  if (screen !== 'exam' || !S) return;
+  cur().anno = { stem: $('#stem').innerHTML, opts: [...document.querySelectorAll('.otext')].map(e => e.innerHTML) };
+}
+function leave() { if (S.enter !== null) { cur().ms += Date.now() - S.enter; S.enter = null; } }
+function go(i) {
+  saveAnno(); leave();
+  S.idx = i;
+  if (!S.finished) S.enter = Date.now();
+  render();
+  window.scrollTo(0, 0);
+}
+
+function render() {
+  const it = cur(), q = it.q, n = S.items.length;
+  $('#hdrInfo').textContent = S.infinite
+    ? `Infinite mode  ·  Question ${S.idx + 1}  ·  ${S.items.filter(x => x.done).length} answered  ·  ${q.domain}`
+    : `Question ${S.idx + 1} of ${n}  ·  ${q.domain}`;
+  $('#progress div').style.width = ((S.idx + 1) / n * 100) + '%';
+  const stem = $('#stem');
+  stem.innerHTML = '';
+  q.stem.forEach(p => { const e = document.createElement('p'); e.textContent = p; stem.appendChild(e); });
+  stem.classList.add('annot');
+  const opts = $('#opts');
+  opts.innerHTML = '';
+  q.options.forEach((o, i) => {
+    const d = document.createElement('div');
+    d.className = 'opt';
+    d.dataset.i = i;
+    d.innerHTML = `<span class="key">${i + 1}</span><span class="otext annot"></span>`;
+    d.querySelector('.otext').textContent = o.text;
+    d.addEventListener('click', () => { if (String(getSelection()).trim()) return; choose(i); });
+    opts.appendChild(d);
+  });
+  if (it.anno) {
+    stem.innerHTML = it.anno.stem;
+    document.querySelectorAll('.otext').forEach((e, i) => e.innerHTML = it.anno.opts[i]);
+  }
+  opts.classList.toggle('done', it.done);
+  paint();
+  renderNav();
+}
+
+function paint() {
+  const it = cur(), q = it.q;
+  document.querySelectorAll('.opt').forEach((d, i) => {
+    const sel = it.sel.includes(i), corr = q.options[i].correct;
+    d.classList.remove('sel', 'right', 'wrong', 'missed');
+    if (!it.done) { if (sel) d.classList.add('sel'); return; }
+    if (corr && sel) d.classList.add('right');
+    else if (corr) d.classList.add('right', 'missed');
+    else if (sel) d.classList.add('wrong');
+  });
+  $('#selHint').textContent = it.done ? '' : (q.need > 1 ? `Select ${q.need} (${it.sel.length} selected), then ` : 'Select an answer, then ') + `press ${keyName(keys.next)} to check`;
+  const fb = $('#feedback');
+  if (!it.done) { fb.innerHTML = ''; return; }
+  fb.innerHTML = `<div class="banner ${it.ok ? 'ok' : 'bad'}">${it.ok ? 'Correct — you chose the right answer.' : 'Incorrect.'}</div><div class="card" id="expl">${q.explanation}</div>`;
+}
+
+function renderNav() {
+  const last = S.idx === S.items.length - 1;
+  const p = $('#prev'), n = $('#next');
+  p.textContent = `◂ Previous (${keyName(keys.prev)})`;
+  p.disabled = S.idx === 0;
+  const k = keyName(keys.next);
+  n.textContent = !cur().done ? `Check (${k})` : last ? (S.finished ? `Back to results (${k})` : `Finish (${k})`) : `Next (${k}) ▸`;
+  $('#navMid').textContent = `Options: ${keyName(keys.opt1)}–${keyName(keys.opt6)}  ·  Bold ${keyName(keys.bold)}  Underline ${keyName(keys.underline)}  Strike ${keyName(keys.strike)}  Highlight ${keyName(keys.highlight)}  Clear ${keyName(keys.clear)}`;
+}
+
+function choose(i) {
+  const it = cur(), q = it.q;
+  if (it.done || i >= q.options.length) return;
+  const k = it.sel.indexOf(i);
+  if (k >= 0) it.sel.splice(k, 1);
+  else if (q.need === 1) it.sel = [i];
+  else it.sel.push(i);
+  paint();
+}
+
+function check() {
+  const it = cur(), q = it.q;
+  if (it.sel.length !== q.need) {
+    $('#selHint').textContent = q.need > 1 ? `Select exactly ${q.need} answers first (${it.sel.length} selected)` : 'Select an answer first';
+    return;
+  }
+  it.done = true;
+  it.ok = it.sel.every(x => q.options[x].correct);
+  const r = P.questions[q.id] || (P.questions[q.id] = { attempts: 0, correct: 0 });
+  r.attempts++; r.correct += it.ok ? 1 : 0; r.last_ok = it.ok;
+  post('/api/answer', { id: q.id, ok: it.ok });
+  $('#opts').classList.add('done');
+  paint();
+  renderNav();
+}
+
+function next() {
+  if (!cur().done) return check();
+  return skip();
+}
+
+function skip() {
+  if (S.idx < S.items.length - 1) return go(S.idx + 1);
+  if (S.finished) return results();
+  const un = (S.infinite ? S.items.filter(x => x.done || x.ms > 0 || x === cur()) : S.items).filter(x => !x.done).length;
+  if (un && !confirm(`${un} question(s) unanswered. Finish anyway?`)) return;
+  finish();
+}
+function endTest() {
+  if (S.finished) return results();
+  const done = S.items.filter(x => x.done).length;
+  const msg = S.infinite ? `End the session? ${done} questions answered.` : `End the test now? ${done} of ${S.items.length} questions answered; the rest will count as unanswered.`;
+  if (!confirm(msg)) return;
+  finish();
+}
+function prev() { if (S.idx > 0) go(S.idx - 1); }
+function finish() {
+  saveAnno(); leave(); S.finished = true;
+  if (S.infinite) {
+    const seen = S.items.filter(x => x.done || x.ms > 0);
+    S.items = seen.length ? seen : S.items.slice(0, 1);
+    S.idx = Math.min(S.idx, S.items.length - 1);
+  }
+  const s = {
+    total: S.items.length, answered: S.items.filter(x => x.done).length, correct: S.items.filter(x => x.ok).length,
+    ms: S.items.reduce((a, x) => a + x.ms, 0),
+  };
+  s.ts = new Date().toISOString().slice(0, 19);
+  P.sessions.push(s);
+  post('/api/session', s);
+  results();
+}
+
+function results() {
+  show('result');
+  const items = S.items, n = items.length;
+  const ok = items.filter(x => x.ok).length, wrong = items.filter(x => x.done && !x.ok).length, un = n - ok - wrong;
+  const total = items.reduce((a, x) => a + x.ms, 0);
+  $('#stats').innerHTML = `
+    <div><b>${Math.round(ok / n * 100)}%</b>score (${ok} / ${n})</div>
+    <div><b>${wrong}</b>incorrect</div>
+    <div><b>${un}</b>unanswered</div>
+    <div><b>${fmtT(total)}</b>total time</div>
+    <div><b>${fmtT(total / n)}</b>average per question</div>`;
+  $('#breakdown').classList.add('hidden');
+  $('#breakdown').innerHTML = `<table><tr><th>#</th><th>Source</th><th>Domain</th><th>Result</th><th>Time</th></tr>` +
+    items.map((x, i) => `<tr class="row" data-i="${i}"><td>${i + 1}</td><td>Exam ${x.q.exam} · Q${x.q.num}</td><td>${x.q.domain}</td>
+      <td class="${x.ok ? 'good' : x.done ? 'badc' : 'skip'}">${x.ok ? '✓ correct' : x.done ? '✗ incorrect' : '– skipped'}</td><td>${fmtT(x.ms)}</td></tr>`).join('') + '</table>' +
+    '<p class="hint">Click a row to review that question.</p>';
+  document.querySelectorAll('#breakdown .row').forEach(r => r.addEventListener('click', () => { S.idx = +r.dataset.i; show('exam'); render(); window.scrollTo(0, 0); }));
+}
+
+/* ---------- text formatting ---------- */
+function formatSelection(action) {
+  const sel = getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return;
+  const r = sel.getRangeAt(0);
+  let root = r.commonAncestorContainer;
+  if (root.nodeType === 3) root = root.parentNode;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const segs = [];
+  let n;
+  while ((n = walker.nextNode())) {
+    if (!r.intersectsNode(n) || !n.parentElement.closest('.annot')) continue;
+    const s = n === r.startContainer ? r.startOffset : 0;
+    const e = n === r.endContainer ? r.endOffset : n.length;
+    if (s < e) segs.push([n, s, e]);
+  }
+  if (!segs.length) return;
+  const isolated = segs.map(([node, s, e]) => {
+    let t = node;
+    if (e < t.length) t.splitText(e);
+    if (s > 0) t = t.splitText(s);
+    return t;
+  });
+  const unwrap = span => { const p = span.parentNode; while (span.firstChild) p.insertBefore(span.firstChild, span); p.removeChild(span); p.normalize(); };
+  if (action === 'clear') {
+    isolated.forEach(t => { let sp; while ((sp = t.parentElement && t.parentElement.closest('[class^="f-"]'))) unwrap(sp); });
+  } else {
+    const cls = FMT[action];
+    const allOn = isolated.every(t => t.parentElement.closest('.' + cls));
+    isolated.forEach(t => {
+      if (allOn) { const sp = t.parentElement.closest('.' + cls); if (sp) unwrap(sp); }
+      else if (!t.parentElement.closest('.' + cls)) {
+        const sp = document.createElement('span');
+        sp.className = cls;
+        t.parentNode.replaceChild(sp, t);
+        sp.appendChild(t);
+      }
+    });
+  }
+  sel.removeAllRanges();
+}
+
+/* ---------- actions & keys ---------- */
+function run(a) {
+  if (a.startsWith('opt')) return choose(+a.slice(3) - 1);
+  if (a === 'next') return next();
+  if (a === 'skip') return skip();
+  if (a === 'finish') return endTest();
+  if (a === 'prev') return prev();
+  if (a === 'fontUp') return setFont(fs + 2);
+  if (a === 'fontDown') return setFont(fs - 2);
+  formatSelection(a);
+}
+
+document.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); });
+
+document.addEventListener('keydown', e => {
+  if (rebind) {
+    e.preventDefault();
+    if (['Shift', 'Control', 'Alt', 'Meta'].includes(e.key)) return;
+    if (e.key !== 'Escape') { keys[rebind] = normKey(e); localStorage.setItem('keys', JSON.stringify(keys)); }
+    rebind = null; renderKeys(); if (screen === 'exam') renderNav();
+    return;
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!$('#modal').classList.contains('hidden')) { if (e.key === 'Escape') closeModal(); return; }
+  if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) { if (e.key === 'Enter' && screen === 'setup') start(); return; }
+  if (screen === 'setup') { if (e.key === 'Enter') start(); return; }
+  if (screen !== 'exam') return;
+  let k = normKey(e);
+  if (k === '+' && keys.fontUp === '=') k = '=';
+  const act = Object.keys(keys).find(a => keys[a] === k);
+  if (act) { e.preventDefault(); run(act); }
+});
+
+function renderKeys() {
+  $('#keyTable').innerHTML = Object.keys(DEFAULT_KEYS).map(a =>
+    `<tr><td>${LABELS[a]}</td><td><kbd>${rebind === a ? 'press a key…' : keyName(keys[a])}</kbd></td><td><button data-a="${a}">Change</button></td></tr>`).join('');
+  document.querySelectorAll('#keyTable button').forEach(b => b.addEventListener('click', () => { rebind = b.dataset.a; renderKeys(); }));
+}
+function openModal() { renderKeys(); $('#modal').classList.remove('hidden'); }
+function closeModal() { rebind = null; $('#modal').classList.add('hidden'); }
+
+$('#btnSettings').addEventListener('click', openModal);
+$('#closeModal').addEventListener('click', closeModal);
+$('#resetKeys').addEventListener('click', () => { keys = { ...DEFAULT_KEYS }; localStorage.removeItem('keys'); renderKeys(); if (screen === 'exam') renderNav(); });
+document.querySelectorAll('#fmtBtns button').forEach(b => b.addEventListener('click', () => formatSelection(b.dataset.f)));
+$('#endTest').addEventListener('click', endTest);
+$('#fPlus').addEventListener('click', () => setFont(fs + 2));
+$('#fMinus').addEventListener('click', () => setFont(fs - 2));
+$('#start').addEventListener('click', start);
+$('#domain').addEventListener('change', updatePool);
+$('#mode').addEventListener('change', updatePool);
+$('#inf').addEventListener('change', () => { $('#count').disabled = $('#inf').checked; });
+$('#resetProg').addEventListener('click', async () => {
+  if (!confirm('Reset all progress (answers and test history)? This cannot be undone.')) return;
+  await post('/api/reset');
+  P = { questions: {}, sessions: [] };
+  updatePool();
+});
+$('#prev').addEventListener('click', prev);
+$('#next').addEventListener('click', next);
+$('#again').addEventListener('click', () => { show('setup'); updatePool(); });
+$('#toggleBreak').addEventListener('click', () => $('#breakdown').classList.toggle('hidden'));
+
+init();
+</script>
+</body>
+</html>
