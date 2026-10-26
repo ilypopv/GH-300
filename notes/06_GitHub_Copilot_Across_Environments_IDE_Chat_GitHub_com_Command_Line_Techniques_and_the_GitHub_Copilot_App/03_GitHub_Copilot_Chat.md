@@ -1,0 +1,133 @@
+# GitHub Copilot Chat
+
+GitHub Copilot Chat is an advanced feature of the GitHub Copilot ecosystem, designed to provide developers with an interactive, conversational AI assistant directly within their development environment. It allows developers to have natural language conversations about their code, ask questions, and receive intelligent responses and suggestions in real-time. In this unit, we cover:
+
+- How to generate code using GitHub Copilot Chat.
+- Debugging using GitHub Copilot Chat.
+- How to get code explanations using GitHub Copilot Chat.
+- Using slash commands to perform actions with GitHub Copilot.
+- Using custom GitHub Copilot agents to improve prompts.
+
+To access Copilot in your Integrated Development Environment(IDE), click the chat icon on the left navbar.
+
+![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/chat.png)
+
+GitHub Copilot Chat is beneficial in certain scenarios:
+
+- **Complex code generation** When you need to implement complex algorithms, data structures, or generate boilerplate code for specific design patterns, Copilot Chat can help streamline the process. It can help create intricate regular expressions, construct detailed SQL queries, or develop advanced data structures like a Bubble sort in Python.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/chat-code-generation.png)
+
+- **Debugging assistance** If you encounter errors in your code, Copilot Chat can be valuable in analyzing error messages and suggesting potential fixes. It can help identify logical errors and provide step-by-step explanations of problematic sections of code. One way to achieve this result is by using Copilot inline-chat by highlighting the piece of code containing the error, right clicking and selecting Copilot, then inline-chat.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/selection-code-chat-debugging.png)
+
+  For example, you might ask, "I'm getting a `NullReferenceException` in this method. Can you help me debug it?"
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/generating-code-chat-debugging.png)
+
+- **Code explanations** Copilot Chat can also be used to better understand complex code snippets. It can break down code into simpler terms, explain the purpose and functionality of unfamiliar code, and offer insights into best practices and potential optimizations. For example, you could ask: - "Can you explain how this async/await code works in Python?"
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/chat-code-explanations.png)
+
+## How to improve GitHub Copilot Chat responses
+
+You can significantly improve the quality and relevance of GitHub Copilot Chat's responses with certain key features. Let's dive into them.
+
+### Scope referencing
+
+To enhance the accuracy and relevance of the responses provided by GitHub Copilot Chat, it’s important to properly scope your questions using references. Here’s how you can do that:
+
+- **File references:** You can specify a particular file in your question by adding a `#file:` before the file name.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/chat-scope-file-referencing-pick.png)
+
+  For example, if you’re working with a file named `controller.js`, you can use the #file command to select it and reference it directly in your question as `#file:controller.js`. This feature tells Copilot Chat to focus on the contents of that file when generating a response.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/chat-scope-file-referencing.png)
+
+- **Environment References**: You can use Copilot Chat alongside your terminal to get help based on command output. This allows Copilot to assist with debugging and provide suggestions based on what is happening in your terminal. For example, asking “@terminal how do I fix this error?” lets Copilot analyze the terminal output and suggest relevant solutions.
+
+### Slash commands
+
+Slash commands in GitHub Copilot Chat allow you to quickly specify the intent of your query. This can significantly improve the quality of the responses you receive by making your requests more focused. Here are some commonly used slash commands:
+
+- **/doc:** Adds comments to the specified or selected code. For example, you can type `/doc` followed by the code you want to document, and Copilot generates appropriate comments.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/doc-slash-commands.png)
+
+- **/explain:** Provides explanations for selected code. This command is useful when you need to understand what a particular piece of code does. For example, `/explain the #file:controller.js` gives you a detailed explanation of that file.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/explain-slash-commands.png)
+
+- **/fix:** Proposes fixes for problems in the selected code. If you're facing issues, you can highlight the problematic section and use `/fix` to receive suggestions for resolving the issue.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/fix-slash-commands.png)
+
+- **/generate:** Helps in generating new code based on your requirements. For example, `/generate code to find the root of a number in client.js` creates a function to perform the task.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/generate-slash-commands.png)
+
+- **/optimize:** Analyzes and suggests improvements to the running time or efficiency of the selected code. For instance, `/optimize the calculate method in controller.js` focuses on enhancing the performance of that specific method.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/optimize-slash-commands.png)
+
+- **/tests:** Automatically creates unit tests for the selected code. You can simply highlight the code and use `/tests using Mocha` to generate tests.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/tests-slash-commands.png)
+
+### Model selection and premium features
+
+GitHub Copilot Chat offers different AI models to optimize your development workflow. Some environments provide model selection options that let you choose between different capability levels based on your specific needs:
+
+**Standard models (GPT-4o):**
+
+- Provide fast, reliable responses for most development tasks
+- Consume 1 PRU per request
+- Ideal for routine coding assistance, code explanations, and basic debugging
+- Examples: Simple function generation, syntax help, basic refactoring suggestions
+
+**Premium models (o1-preview, o1-mini):**
+
+- Offer enhanced reasoning capabilities for complex problems
+- Consume 2 PRUs per request (double the standard rate)
+- Better suited for sophisticated analysis, complex algorithms, and architectural decisions
+- Examples: Advanced debugging of multi-threaded code, complex algorithm design, security analysis
+
+When working on challenging problems that require deep reasoning, premium models can provide more thorough analysis and comprehensive solutions. However, consider your PRU usage when selecting models for different types of tasks.
+
+### Copilot agents
+
+GitHub Copilot agents are custom tools that you can build and integrate with GitHub Copilot Chat to provide additional functionalities tailored to your specific needs. In addition to slash commands, you can use specific agents within Copilot Chat in your IDE to handle different tasks:
+
+You can also use the “/new” smart action to generate a completely new project from scratch based on your requirements. For example, you can prompt Copilot to create a new project with:
+
+**text**
+
+```txt
+/new generate a new HTML file with pages and JavaScript for advanced calculations
+```
+
+Click on “Create Workspace” to proceed with code generation and just like that you have your new project with the code you requested.
+
+- **@terminal:** This agent is useful for command-line related questions. For example, you could ask it to find the largest file in a directory or explain the last command you ran.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/terminal-agent-command.png)
+
+- **@vscode:** Use this agent to ask questions related to Visual Studio Code, such as how to debug or change settings within the IDE.
+
+  ![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/vscode-agent-command.png)
+
+  By effectively utilizing these tools and techniques, you can significantly improve the quality of responses you receive from GitHub Copilot Chat, making your coding experience more efficient and productive.
+
+### Sharing feedback on GitHub Copilot Chat
+
+Most IDEs with Copilot Chat integration have built-in feedback mechanisms. For example, in Visual Studio Code, you can find feedback options at the beginning of GitHub Copilot Chat's suggestions. Hover over a suggestion, and you should see "thumbs up" and "thumbs down" buttons.
+
+![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/thumbs-up-helpful-buttons.png)
+
+Click on the thumbs up to rate a suggestion as helpful.
+
+![](https://learn.microsoft.com/en-us/training/github/github-copilot-across-environments/media/thumbs-down-unhelpful.png)
+
+Click on thumbs down to rate an unhelpful one.
